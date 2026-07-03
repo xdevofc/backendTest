@@ -1,0 +1,44 @@
+# .NET build output
+[Bb]in/
+[Oo]bj/
+publish/
+out/
+
+# IDE / editor local state
+.vs/
+.vscode/
+.idea/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs / test output / coverage
+*.log
+TestResults/
+*.trx
+coverage/
+*.coverage
+*.coveragexml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local secrets / machine-specific config
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+
+# Local databases, only if generated at runtime
+*.db
+*.sqlite
+*.sqlite3
+
+# NuGet artifacts
+packages/
+!**/packages/build/
+*.nupkg
