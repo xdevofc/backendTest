@@ -1,3 +1,5 @@
+
+namespace TechnicalBackendTest.Api.Domain.Entities;
 public class Address
 {
 

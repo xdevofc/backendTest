@@ -1,3 +1,4 @@
+namespace TechnicalBackendTest.Api.Domain.Entities;
 public class User
 {
     public int Id {get; set;}
