@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-
+using TechnicalBackendTest.Api.Domain.Entities;
 namespace TechnicalBackendTest.Api.Infrastructure.Persistence;
 
 public class AppDbContext: DbContext 
