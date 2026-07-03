@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TechnicalBackendTest.Api.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
