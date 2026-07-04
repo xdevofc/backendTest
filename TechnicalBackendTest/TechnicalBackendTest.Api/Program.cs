@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using TechnicalBackendTest.Api.Application.Addresses.Validators;
@@ -6,6 +7,7 @@ using TechnicalBackendTest.Api.Application.CurrencyConversion.Validators;
 using TechnicalBackendTest.Api.Application.Currencies.Validators;
 using TechnicalBackendTest.Api.Application.Users.Validators;
 using TechnicalBackendTest.Api.Contracts.Request;
+using TechnicalBackendTest.Api.Domain.Entities;
 using TechnicalBackendTest.Api.Endpoints;
 using TechnicalBackendTest.Api.Infrastructure.Persistence;
 using TechnicalBackendTest.Api.Infrastructure.Security;
@@ -33,6 +35,8 @@ builder.Services.AddScoped<IValidator<CreateCurrencyRequest>, CreateCurrencyRequ
 builder.Services.AddScoped<IValidator<ConvertCurrencyRequest>, ConvertCurrencyRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
+builder.Services.AddScoped<IValidator<CheckUserPasswordRequest>, CheckUserPasswordRequestValidator>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

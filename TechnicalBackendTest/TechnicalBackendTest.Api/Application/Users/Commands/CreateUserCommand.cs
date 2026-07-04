@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechnicalBackendTest.Api.Application.Users.Mappings;
 using TechnicalBackendTest.Api.Contracts.Request;
@@ -14,7 +15,8 @@ internal static class CreateUserCommand
     public static async Task<CreateUserCommandResult> ExecuteAsync(
         CreateUserRequest request,
         AppDbContext db,
-        IValidator<CreateUserRequest> validator)
+        IValidator<CreateUserRequest> validator,
+        IPasswordHasher<User> passwordHasher)
     {
         var validation = await validator.ValidateAsync(request);
 
@@ -34,9 +36,10 @@ internal static class CreateUserCommand
         {
             Name = request.Name,
             Email = request.Email,
-            IsActive = true,
-            PasswordHash = string.Empty
+            IsActive = true
         };
+
+        user.PasswordHash = passwordHasher.HashPassword(user, request.Name);
 
         db.Users.Add(user);
         await db.SaveChangesAsync();
