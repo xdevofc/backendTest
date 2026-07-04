@@ -1,7 +1,24 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
+using TechnicalBackendTest.Api.Application.Addresses.Validators;
+using TechnicalBackendTest.Api.Application.CurrencyConversion.Validators;
+using TechnicalBackendTest.Api.Application.Currencies.Validators;
+using TechnicalBackendTest.Api.Application.Users.Validators;
+using TechnicalBackendTest.Api.Contracts.Request;
+using TechnicalBackendTest.Api.Endpoints;
 using TechnicalBackendTest.Api.Infrastructure.Persistence;
+using TechnicalBackendTest.Api.Infrastructure.Security;
+
+const string ApiKeySchemeName = "ApiKey";
 
 var builder = WebApplication.CreateBuilder(args);
+
+var apiKey = builder.Configuration["Security:ApiKey"];
+if (string.IsNullOrWhiteSpace(apiKey))
+{
+    throw new InvalidOperationException("Security:ApiKey must be configured.");
+}
 
 // esto indica que se use el SQLite y que lo guarde en el archivo especificado
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -9,42 +26,57 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Agregando los validadores
+builder.Services.AddScoped<IValidator<CreateAddressRequest>, CreateAddressRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateAddressRequest>, UpdateAddressRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateCurrencyRequest>, CreateCurrencyRequestValidator>();
+builder.Services.AddScoped<IValidator<ConvertCurrencyRequest>, ConvertCurrencyRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Technical Backend Test API",
+        Version = "v1",
+        Description = "Minimal API for users, addresses, currencies, and currency conversion."
+    });
+
+    options.AddSecurityDefinition(ApiKeySchemeName, new OpenApiSecurityScheme
+    {
+        Description = "API Key required in the X-API-KEY header.",
+        Name = "X-API-KEY",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference(ApiKeySchemeName, document, null)] = new List<string>()
+    });
+});
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Technical Backend Test API v1");
+    });
 }
 
-app.UseHttpsRedirection();
+app.UseMiddleware<ApiKeyMiddleware>();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// Agregando los endpoints
+app.MapUsersEndpoints();
+app.MapAddressesEndpoints();
+app.MapCurrenciesEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
