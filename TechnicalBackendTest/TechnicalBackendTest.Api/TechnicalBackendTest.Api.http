@@ -1,6 +1,117 @@
 @TechnicalBackendTest.Api_HostAddress = http://localhost:5229
+@ApiKey = local-dev-api-key
 
-GET {{TechnicalBackendTest.Api_HostAddress}}/weatherforecast/
+POST {{TechnicalBackendTest.Api_HostAddress}}/users/
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "name": "Test User",
+  "email": "test.user@example.com"
+}
+
+###
+
+@userId = 1
+@addressId = 1
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/users/check-password
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "id": {{userId}},
+  "password": "Test User"
+}
+
+###
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/users/check-password
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "id": {{userId}},
+  "password": "Wrong Password"
+}
+
+###
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/users/{{userId}}/addresses
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "street": "Calle Falsa 123",
+  "city": "Asuncion",
+  "country": "Paraguay",
+  "zipCode": "9999"
+}
+
+###
+
+GET {{TechnicalBackendTest.Api_HostAddress}}/users/{{userId}}/addresses
 Accept: application/json
+X-API-KEY: {{ApiKey}}
+
+###
+
+PUT {{TechnicalBackendTest.Api_HostAddress}}/addresses/{{addressId}}
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "street": "Calle Actualizada 456",
+  "city": "Asuncion",
+  "country": "Paraguay",
+  "zipCode": "1000"
+}
+
+###
+
+DELETE {{TechnicalBackendTest.Api_HostAddress}}/addresses/{{addressId}}
+X-API-KEY: {{ApiKey}}
+
+###
+
+GET {{TechnicalBackendTest.Api_HostAddress}}/currencies
+Accept: application/json
+X-API-KEY: {{ApiKey}}
+
+###
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/currencies
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "code": "USD",
+  "name": "United States Dollar",
+  "rateToBase": 1
+}
+
+###
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/currencies
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "code": "PYG",
+  "name": "Paraguayan Guarani",
+  "rateToBase": 0.0001369863
+}
+
+###
+
+POST {{TechnicalBackendTest.Api_HostAddress}}/currency/convert
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "fromCurrencyCode": "USD",
+  "toCurrencyCode": "PYG",
+  "amount": 100
+}
 
 ###
